@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 NEKOPON 🐱</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #faf8ef 0%, #f2e8d5 100%);
+            color: #776e65;
+            font-weight: bold;
+            height: 100vh;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .field {
+            position: absolute;
+            top: 120px;
+            left: 20px;
+            right: 20px;
+            bottom: 70px;
+            border-radius: 15px;
+            padding: 15px;
+            overflow: hidden;
+            pointer-events: none;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+        }
+        
+        .title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Fredoka One', cursive;
+            font-size: 40px;
+            color: #776e65;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.15);
+            z-index: 1001;
+            letter-spacing: 2px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s ease;
+            white-space: nowrap;
+        }
+        
+        .title:hover {
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        .cat-icon {
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.2s ease-out;
+            font-size: 42px;
+            margin: 0 8px;
+        }
+        
+        .cat-icon:hover {
+            transform: scale(1.2) rotate(15deg);
+        }
+        
+        .cat-icon.bounce {
+            animation: cat-bounce 0.8s ease-in-out;
+        }
+        
+        /* タイトル猫も傾きに反応 */
+        .cat-icon.tilt-responsive {
+            transition: transform 0.3s ease-out;
+        }
+        
+        @keyframes cat-bounce {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.4) rotate(15deg); }
+            50% { transform: scale(1.6) rotate(-10deg); }
+            75% { transform: scale(1.3) rotate(12deg); }
+        }
+        
+        .header {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(255,255,255,0.25);
+            padding: 12px 32px;
+            border-radius: 30px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+        }
+        
+        .score-item {
+            font-size: 24px;
+            color: #776e65;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .score-item.pulse {
+            animation: score-pulse 0.6s ease-in-out;
+        }
+        
+        @keyframes score-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); filter: brightness(1.5); }
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 25px;
+            left: 20px;
+            right: 20px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .btn {
+            background: linear-gradient(145deg, #8f7a66, #a68a76);
+            color: #f9f6f2;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(145deg, #9f8a76, #b69a86);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn:hover:before {
+            left: 100%;
+        }
+        
+        .btn:disabled {
+            background: #ccc2b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .cat {
+            position: absolute;
+            font-size: 50px;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            user-select: none;
+            z-index: 100;
+            transform-origin: center;
+            pointer-events: auto;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+        }
+        
+        .cat:not(.dragging):not(.merging):not(.chain) {
+            animation: live-breathe 4s ease-in-out infinite;
+        }
+        
+        .cat:nth-child(3n+1):not(.dragging):not(.merging):not(.chain) {
+            animation: live-pulse 3.5s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+        
+        .cat:nth-child(3n+2):not(.dragging):not(.merging):not(.chain) {
+            animation: live-wiggle 4.2s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        
+        @keyframes live-breathe {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.08) rotate(2deg); }
+        }
+        
+        @keyframes live-pulse {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.12); filter: brightness(1.2); }
+        }
+        
+        @keyframes live-wiggle {
+            0%, 100% { transform: scale(1) rotate(0deg) translateX(0); }
+            25% { transform: scale(1.05) rotate(3deg) translateX(-2px); }
+            75% { transform: scale(1.05) rotate(-3deg) translateX(2px); }
+        }
+        
+        .cat:hover {
+            transform: scale(1.25) !important;
+            animation: none !important;
+            z-index: 200;
+        }
+        
+        .cat.dragging {
+            transform: scale(1.4) rotate(10deg) !important;
+            z-index: 1000;
+            animation: none !important;
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.4));
+            transition: none !important;
+        }
+        
+        .cat.merging {
+            animation: mega-merge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            z-index: 500;
+        }
+        
+        .cat.chain {
+            animation: chain-reaction 1s ease-in-out !important;
+            z-index: 600;
+        }
+        
+        .cat.pop {
+            animation: birth-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        }
+        
+        @keyframes mega-merge {
+            0% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+            30% { transform: scale(1.6) rotate(180deg); filter: brightness(2) hue-rotate(180deg); }
+            60% { transform: scale(2.2) rotate(270deg); filter: brightness(3) hue-rotate(360deg); }
+            100% { transform: scale(1) rotate(360deg); filter: brightness(1); }
+        }
+        
+        @keyframes chain-reaction {
+            0% { transform: scale(1); filter: brightness(1) saturate(1); }
+            25% { transform: scale(1.8); filter: brightness(3) saturate(2) hue-rotate(90deg); }
+            50% { transform: scale(2.4); filter: brightness(4) saturate(3) hue-rotate(180deg); }
+            75% { transform: scale(1.6); filter: brightness(2) saturate(1.5) hue-rotate(270deg); }
+            100% { transform: scale(1); filter: brightness(1) saturate(1) hue-rotate(360deg); }
+        }
+        
+        @keyframes birth-pop {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            60% { transform: scale(1.3) rotate(180deg); opacity: 0.9; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+        
+        .floating-score {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #f59563;
+            pointer-events: none;
+            z-index: 800;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            animation: float-up 2s ease-out forwards;
+            white-space: nowrap;
+        }
+        
+        .floating-score.chain {
+            font-size: 32px;
+            color: #ff6b6b;
+            animation: float-chain 2.5s ease-out forwards;
+        }
+        
+        .floating-score.mega {
+            font-size: 40px;
+            color: #ff1744;
+            animation: float-mega 3s ease-out forwards;
+        }
+        
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
+        }
+        
+        @keyframes float-chain {
+            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+            50% { opacity: 1; transform: translateY(-60px) scale(2) rotate(180deg); }
+            100% { opacity: 0; transform: translateY(-150px) scale(3) rotate(360deg); }
+        }
+        
+        @keyframes float-mega {
+            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+            30% { opacity: 1; transform: translateY(-40px) scale(2.5) rotate(120deg); }
+            60% { opacity: 1; transform: translateY(-100px) scale(4) rotate(240deg); }
+            100% { opacity: 0; transform: translateY(-200px) scale(6) rotate(720deg); }
+        }
+        
+        .msg {
+            position: absolute;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #8f7a66;
+            pointer-events: none;
+            z-index: 700;
+            animation: float 2.5s ease-out forwards;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+            white-space: nowrap;
+        }
+        
+        @keyframes float {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+        }
+        
+        .chain-text {
+            position: absolute;
+            font-family: 'Fredoka One', cursive;
+            font-size: 56px;
+            font-weight: bold;
+            color: #ff6b6b;
+            pointer-events: none;
+            z-index: 900;
+            text-shadow: 4px 4px 8px rgba(0,0,0,0.6);
+            animation: chain-appear 3s ease-out forwards;
+            white-space: nowrap;
+        }
+        
+        @keyframes chain-appear {
+            0% { opacity: 0; transform: scale(0) rotate(-360deg); }
+            20% { opacity: 1; transform: scale(2) rotate(0deg); }
+            80% { opacity: 1; transform: scale(1.5) rotate(10deg); }
+            100% { opacity: 0; transform: scale(0.5) rotate(360deg); }
+        }
+        
+        .particle {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 400;
+            animation: particle-burst 2s ease-out forwards;
+        }
+        
+        @keyframes particle-burst {
+            0% { opacity: 1; transform: scale(0) rotate(0deg); }
+            20% { opacity: 1; transform: scale(1.5) rotate(180deg); }
+            100% { opacity: 0; transform: scale(0.5) rotate(720deg) translateY(-100px); }
+        }
+        
+        .fever-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, rgba(255,69,0,0.1) 100%);
+            pointer-events: none;
+            z-index: 50;
+            animation: fever-pulse 0.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes fever-pulse {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .permission-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 2000;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+        
+        .permission-popup h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #776e65;
+        }
+        
+        .permission-popup p {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #8f7a66;
+        }
+        
+        .permission-popup button {
+            background: #8f7a66;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 5px 3px;
+        }
+        
+        /* スマホ対応 */
+        @media (max-width: 480px) {
+            .title { 
+                font-size: 36px; 
+                top: 18px; 
+                letter-spacing: 1px;
+            }
+            .cat-icon { 
+                font-size: 38px; 
+                margin: 0 6px;
+            }
+            .header { 
+                top: 75px; 
+                gap: 18px; 
+                padding: 10px 25px; 
+            }
+            .score-item { 
+                font-size: 22px; 
+                gap: 6px; 
+            }
+            .field { 
+                top: 115px; 
+            }
+            .cat { 
+                font-size: 40px; 
+            }
+            .footer { 
+                gap: 20px; 
+                bottom: 20px; 
+            }
+            .btn { 
+                padding: 10px 14px; 
+                font-size: 13px; 
+            }
+            .floating-score { 
+                font-size: 20px; 
+            }
+            .chain-text { 
+                font-size: 42px; 
+            }
+            .permission-popup { 
+                max-width: 260px; 
+                padding: 15px; 
+            }
+            .permission-popup h3 {
+                font-size: 16px;
+            }
+            .permission-popup p {
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .title { 
+                font-size: 32px; 
+            }
+            .cat-icon { 
+                font-size: 34px; 
+                margin: 0 4px;
+            }
+            .header { 
+                gap: 15px; 
+                padding: 8px 20px; 
+            }
+            .score-item { 
+                font-size: 20px; 
+                gap: 5px;
+            }
+            .footer { 
+                gap: 15px; 
+            }
+            .btn { 
+                padding: 8px 12px; 
+                font-size: 12px; 
+            }
+            .floating-score { 
+                font-size: 18px; 
+            }
+            .chain-text { 
+                font-size: 36px; 
+            }
+            .permission-popup { 
+                max-width: 240px; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title" id="titleElement">
+        <span class="cat-icon tilt-responsive" id="leftCat">🐱</span>NEKOPON<span class="cat-icon tilt-responsive" id="rightCat">🐱</span>
+    </div>
+    
+    <div class="header">
+        <div class="score-item" id="scoreItem">✨ <span id="score">0</span></div>
+        <div class="score-item" id="chainItem">🔥 <span id="chainDisplay">0</span></div>
+        <div class="score-item" id="levelItem">🏆 <span id="level">1</span></div>
+    </div>
+    
+    <div class="field" id="field"></div>
+    
+    <div class="footer">
+        <button class="btn" id="auto">🤖 AUTO <span id="autoCost">100</span></button>
+        <button class="btn" id="boost">💫 BOOST <span id="boostCost">300</span></button>
+        <button class="btn" id="magic">🌈 MAGIC <span id="magicCost">800</span></button>
+    </div>
+
+    <script>
+        class UltimateNekopon {
+            constructor() {
+                this.score = 0;
+                this.level = 1;
+                this.cats = [];
+                this.catId = 0;
+                this.helpers = 0;
+                this.chainCount = 0;
+                this.maxChain = 0;
+                this.feverMode = false;
+                this.feverTimer = null;
+                this.discovered = new Set();
+                this.audioContext = null;
+                
+                // 傾き感知関連
+                this.tiltEnabled = false;
+                this.currentTilt = { gamma: 0, beta: 0 };
+                this.lastTiltTime = 0;
+                
+                // 進化チェーン
+                this.evolutionChain = [
+                    '😺', '😸', '😻', '🙀', '😿', '😾', 
+                    '🐱', '🐈', '🐈‍⬛', '🦁', '🐯', 
+                    '👑😺', '👑😸', '👑😻', '👑🙀', '👑😿',
+                    '⭐😺', '⭐😸', '⭐😻', '⭐🙀', '⭐😿',
+                    '🌟👑😺', '🌟👑😸', '🌟👑😻', '💫⭐😺', '💫⭐😸',
+                    '🔥💫⭐😺', '⚡🔥💫😺', '🌈⚡🔥😺', '👼🌈⚡😺', '🚀👼🌈😺'
+                ];
+                
+                this.happyMsgs = [
+                    'かわいい！', 'すてき♪', 'だいすき！', 'やったね！', 'すごーい！',
+                    'きゃー♪', 'わーい！', 'ぺろぺろ', 'もふもふ', 'にゃんにゃん'
+                ];
+                
+                this.chainMsgs = [
+                    'NICE!', 'GREAT!', 'EXCELLENT!', 'AMAZING!', 'INCREDIBLE!',
+                    'LEGENDARY!', 'GODLIKE!', 'IMPOSSIBLE!', 'ULTIMATE!', 'DIVINE!'
+                ];
+                
+                this.init();
+            }
+            
+            init() {
+                // 傾き感知の初期化
+                this.initTiltSensor();
+                
+                // 全画面タップ対応
+                document.body.addEventListener('click', (e) => this.handleBodyClick(e));
+                document.body.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    this.handleBodyClick({clientX: touch.clientX, clientY: touch.clientY});
+                });
+                
+                // タイトル猫のタップ
+                document.getElementById('leftCat').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.bounceCat('left');
+                });
+                
+                document.getElementById('rightCat').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.bounceCat('right');
+                });
+                
+                // ボタンイベント
+                document.getElementById('auto').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.buyAuto();
+                });
+                document.getElementById('boost').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.buyBoost();
+                });
+                document.getElementById('magic').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.buyMagic();
+                });
+                
+                // 音声初期化
+                document.addEventListener('click', () => this.initSound(), {once: true});
+                document.addEventListener('touchstart', () => this.initSound(), {once: true});
+                
+                // ハプティックフィードバック対応
+                this.vibrate = (pattern) => {
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate(pattern);
+                    }
+                };
+                
+                // ゲームループ
+                setInterval(() => this.update(), 16);
+                setInterval(() => this.autoSpawn(), 4000);
+                
+                this.updateUI();
+            }
+            
+            initTiltSensor() {
+                // iOS 13以降の許可要求
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    this.showTiltPermissionPopup();
+                } else {
+                    this.enableTiltSensor();
+                }
+            }
+            
+            showTiltPermissionPopup() {
+                const popup = document.createElement('div');
+                popup.className = 'permission-popup';
+                popup.innerHTML = `
+                    <h3>🐱 猫反応機能 🐱</h3>
+                    <p>スマホを傾けると猫がクルクル回転します♪</p>
+                    <button onclick="game.requestTiltPermission()">有効にする</button>
+                    <button onclick="game.skipTiltPermission()">スキップ</button>
+                `;
+                document.body.appendChild(popup);
+                this.permissionPopup = popup;
+            }
+            
+            async requestTiltPermission() {
+                try {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission === 'granted') {
+                        this.enableTiltSensor();
+                        this.showMsg('猫がクルクル回転！', window.innerWidth/2, window.innerHeight/2);
+                    }
+                } catch (error) {
+                    console.log('Permission denied');
+                }
+                this.closeTiltPermissionPopup();
+            }
+            
+            skipTiltPermission() {
+                this.closeTiltPermissionPopup();
+            }
+            
+            closeTiltPermissionPopup() {
+                if (this.permissionPopup) {
+                    this.permissionPopup.remove();
+                    this.permissionPopup = null;
+                }
+            }
+            
+            enableTiltSensor() {
+                this.tiltEnabled = true;
+                
+                window.addEventListener('deviceorientation', (event) => {
+                    if (!this.tiltEnabled) return;
+                    
+                    this.currentTilt.gamma = event.gamma || 0; // 左右の傾き (-90 to 90)
+                    this.currentTilt.beta = event.beta || 0;   // 前後の傾き (-180 to 180)
+                    
+                    this.updateCatOrientations();
+                });
+            }
+            
+            updateCatOrientations() {
+                const now = Date.now();
+                if (now - this.lastTiltTime < 30) return; // 30FPSに制限
+                this.lastTiltTime = now;
+                
+                const gamma = this.currentTilt.gamma;
+                const beta = this.currentTilt.beta;
+                
+                // 大幅に回転角度を増加
+                let baseRotation = gamma * 1.5; // 1.5倍の回転
+                
+                // 逆さまの場合は180度追加（判定を緩く）
+                if (Math.abs(beta) > 90) {
+                    baseRotation += 180;
+                }
+                
+                // さらに大きく回転させる
+                if (Math.abs(gamma) > 30) {
+                    baseRotation = gamma * 2; // より大きな回転
+                }
+                
+                // 全ての猫に適用（より大きな回転）
+                this.cats.forEach((cat, index) => {
+                    if (cat.element.classList.contains('dragging')) return;
+                    
+                    // それぞれ異なる回転で動的に
+                    const individualRotation = baseRotation + (index % 5 - 2) * 15;
+                    
+                    // 回転を適用（マージやチェーンアニメーション中は除く）
+                    if (!cat.element.classList.contains('merging') && 
+                        !cat.element.classList.contains('chain') &&
+                        !cat.element.classList.contains('pop')) {
+                        cat.element.style.transform = `rotate(${individualRotation}deg) scale(1)`;
+                    }
+                });
+                
+                // タイトルの猫も大きく回転
+                const titleLeftCat = document.getElementById('leftCat');
+                const titleRightCat = document.getElementById('rightCat');
+                
+                if (titleLeftCat && titleRightCat) {
+                    // タイトル猫はより大きく回転
+                    const titleRotationLeft = baseRotation * 1.2 - 20;
+                    const titleRotationRight = baseRotation * 1.2 + 20;
+                    
+                    titleLeftCat.style.transform = `rotate(${titleRotationLeft}deg) scale(1)`;
+                    titleRightCat.style.transform = `rotate(${titleRotationRight}deg) scale(1)`;
+                }
+            }
+            
+            handleBodyClick(e) {
+                // UIエレメントかどうかチェック
+                const target = e.target || document.elementFromPoint(e.clientX, e.clientY);
+                if (target && (
+                    target.closest('.header') || 
+                    target.closest('.footer') || 
+                    target.closest('.title') ||
+                    target.classList.contains('btn') ||
+                    target.closest('.permission-popup')
+                )) {
+                    return;
+                }
+                
+                this.spawn(e);
+            }
+            
+            bounceCat(side) {
+                const catId = side === 'left' ? 'leftCat' : 'rightCat';
+                const catElement = document.getElementById(catId);
+                catElement.classList.add('bounce');
+                
+                this.playSound('purr');
+                this.vibrate([50]);
+                
+                const rect = catElement.getBoundingClientRect();
+                this.createParticles(rect.left + rect.width/2, rect.top + rect.height/2, ['💫', '✨', '🌟'], 3);
+                
+                // ボーナス
+                this.score += 10;
+                this.showFloatingScore(10, rect.left + rect.width/2, rect.top + rect.height/2);
+                this.showMsg('にゃん♪', rect.left + rect.width/2, rect.top + rect.height/2);
+                
+                setTimeout(() => catElement.classList.remove('bounce'), 800);
+                this.updateUI();
+            }
+            
+            initSound() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+            
+            spawn(e) {
+                const rect = document.getElementById('field').getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+                
+                // フィールド内に調整
+                x = Math.max(30, Math.min(rect.width - 30, x));
+                y = Math.max(30, Math.min(rect.height - 30, y));
+                
+                const level = 0; // 常に最初のレベルから
+                const type = this.evolutionChain[level];
+                
+                const cat = {
+                    id: this.catId++,
+                    x, y,
+                    level,
+                    type,
+                    element: null,
+                    birth: Date.now()
+                };
+                
+                cat.element = this.createElement(cat);
+                this.cats.push(cat);
+                
+                const basePoints = this.feverMode ? 10 : 5;
+                this.score += basePoints;
+                this.discovered.add(type);
+                
+                this.playSound('spawn');
+                this.vibrate([30]);
+                this.createParticles(e.clientX, e.clientY, ['✨', '🌟'], 2);
+                this.showFloatingScore(basePoints, e.clientX, e.clientY);
+                this.showMsg(this.happyMsgs[Math.floor(Math.random() * this.happyMsgs.length)], e.clientX, e.clientY);
+                
+                setTimeout(() => this.checkMerge(), 100);
+                this.updateUI();
+            }
+            
+            createElement(cat) {
+                const el = document.createElement('div');
+                el.className = 'cat pop';
+                el.textContent = cat.type;
+                el.style.left = (cat.x - 25) + 'px';
+                el.style.top = (cat.y - 25) + 'px';
+                
+                setTimeout(() => el.classList.remove('pop'), 600);
+                
+                this.setupDrag(el, cat);
+                document.getElementById('field').appendChild(el);
+                return el;
+            }
+            
+            setupDrag(el, cat) {
+                let dragging = false;
+                let longPress = null;
+                
+                const start = (e) => {
+                    e.stopPropagation();
+                    dragging = true;
+                    el.classList.add('dragging');
+                    longPress = setTimeout(() => this.pet(cat), 600);
+                    e.preventDefault();
+                };
+                
+                const end = () => {
+                    if (dragging) {
+                        dragging = false;
+                        el.classList.remove('dragging');
+                        clearTimeout(longPress);
+                        setTimeout(() => this.checkMerge(), 50);
+                    }
+                };
+                
+                const move = (clientX, clientY) => {
+                    if (dragging) {
+                        clearTimeout(longPress);
+                        const rect = document.getElementById('field').getBoundingClientRect();
+                        cat.x = Math.max(25, Math.min(rect.width - 25, clientX - rect.left));
+                        cat.y = Math.max(25, Math.min(rect.height - 25, clientY - rect.top));
+                        el.style.left = (cat.x - 25) + 'px';
+                        el.style.top = (cat.y - 25) + 'px';
+                    }
+                };
+                
+                el.addEventListener('mousedown', start);
+                document.addEventListener('mouseup', end);
+                document.addEventListener('mousemove', (e) => move(e.clientX, e.clientY));
+                
+                el.addEventListener('touchstart', start);
+                document.addEventListener('touchend', end);
+                el.addEventListener('touchmove', (e) => {
+                    if (e.touches.length > 0) {
+                        const touch = e.touches[0];
+                        move(touch.clientX, touch.clientY);
+                    }
+                });
+            }
+            
+            pet(cat) {
+                cat.element.classList.add('merging');
+                const points = this.feverMode ? 20 : 10;
+                this.score += points;
+                this.playSound('purr');
+                this.vibrate([100, 50, 100]);
+                
+                const rect = document.getElementById('field').getBoundingClientRect();
+                this.showFloatingScore(points, cat.x + rect.left, cat.y + rect.top);
+                this.showMsg('💕', cat.x + rect.left, cat.y + rect.top);
+                this.createParticles(cat.x + rect.left, cat.y + rect.top, ['💖', '💕', '💓'], 4);
+                
+                setTimeout(() => cat.element.classList.remove('merging'), 800);
+                this.updateUI();
+            }
+            
+            checkMerge() {
+                const mergeGroups = new Map();
+                
+                // 同じタイプでグループ化
+                for (let i = 0; i < this.cats.length; i++) {
+                    const cat = this.cats[i];
+                    if (!mergeGroups.has(cat.type)) {
+                        mergeGroups.set(cat.type, []);
+                    }
+                    mergeGroups.get(cat.type).push({cat, index: i});
+                }
+                
+                // マージ処理
+                for (const [type, group] of mergeGroups) {
+                    if (group.length >= 2) {
+                        // 2匹以上いるグループで距離チェック
+                        for (let i = 0; i < group.length; i++) {
+                            for (let j = i + 1; j < group.length; j++) {
+                                const a = group[i].cat;
+                                const b = group[j].cat;
+                                const dist = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+                                
+                                if (dist < 70) { // 重なったら合体
+                                    this.merge([group[i], group[j]]);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 3匹以上の場合はコンボマージチェック
+                    if (group.length >= 3) {
+                        for (let i = 0; i < group.length; i++) {
+                            for (let j = i + 1; j < group.length; j++) {
+                                for (let k = j + 1; k < group.length; k++) {
+                                    const a = group[i].cat;
+                                    const b = group[j].cat;
+                                    const c = group[k].cat;
+                                    
+                                    const dist1 = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+                                    const dist2 = Math.sqrt((b.x - c.x) ** 2 + (b.y - c.y) ** 2);
+                                    const dist3 = Math.sqrt((a.x - c.x) ** 2 + (a.y - c.y) ** 2);
+                                    
+                                    if (dist1 < 90 && dist2 < 90 && dist3 < 90) {
+                                        this.comboMerge([group[i], group[j], group[k]]);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            merge(group) {
+                // マージエフェクト
+                group.forEach(item => {
+                    item.cat.element.classList.add('merging');
+                });
+                
+                setTimeout(() => {
+                    // 中心点計算
+                    const centerX = group.reduce((sum, item) => sum + item.cat.x, 0) / group.length;
+                    const centerY = group.reduce((sum, item) => sum + item.cat.y, 0) / group.length;
+                    
+                    // 古いネコを削除
+                    const indices = group.map(item => item.index).sort((a, b) => b - a);
+                    indices.forEach(index => {
+                        this.cats[index].element.remove();
+                        this.cats.splice(index, 1);
+                    });
+                    
+                    // 新しいネコ生成
+                    const oldLevel = group[0].cat.level;
+                    const newLevel = Math.min(this.evolutionChain.length - 1, oldLevel + 1);
+                    const newType = this.evolutionChain[newLevel];
+                    const newCat = {
+                        id: this.catId++,
+                        x: centerX,
+                        y: centerY,
+                        level: newLevel,
+                        type: newType,
+                        element: null,
+                        birth: Date.now()
+                    };
+                    
+                    newCat.element = this.createElement(newCat);
+                    this.cats.push(newCat);
+                    
+                    // スコア計算
+                    const basePoints = Math.pow(2, newLevel + 1) * 10;
+                    const points = this.feverMode ? basePoints * 2 : basePoints;
+                    this.score += points;
+                    this.discovered.add(newType);
+                    
+                    // チェーン増加
+                    this.chainCount++;
+                    this.maxChain = Math.max(this.maxChain, this.chainCount);
+                    this.updateChainDisplay();
+                    
+                    // フィーバーモード判定
+                    if (this.chainCount >= 3 && !this.feverMode) {
+                        this.enterFeverMode();
+                    }
+                    
+                    // レベルアップ判定
+                    if (newLevel > this.level) {
+                        this.level = newLevel;
+                        this.playSound('levelup');
+                        this.vibrate([200, 100, 200]);
+                    } else {
+                        this.playSound('merge');
+                        this.vibrate([100]);
+                    }
+                    
+                    const rect = document.getElementById('field').getBoundingClientRect();
+                    this.showFloatingScore(points, centerX + rect.left, centerY + rect.top);
+                    this.createMegaExplosion(centerX + rect.left, centerY + rect.top);
+                    
+                    // 連鎖チェック
+                    setTimeout(() => this.checkMerge(), 200);
+                    
+                }, 400);
+                
+                this.updateUI();
+            }
+            
+            comboMerge(group) {
+                // コンボエフェクト
+                group.forEach(item => {
+                    item.cat.element.classList.add('chain');
+                });
+                
+                setTimeout(() => {
+                    const centerX = group.reduce((sum, item) => sum + item.cat.x, 0) / group.length;
+                    const centerY = group.reduce((sum, item) => sum + item.cat.y, 0) / group.length;
+                    
+                    // 古いネコを削除
+                    const indices = group.map(item => item.index).sort((a, b) => b - a);
+                    indices.forEach(index => {
+                        this.cats[index].element.remove();
+                        this.cats.splice(index, 1);
+                    });
+                    
+                    // 2レベル上の新しいネコ生成
+                    const oldLevel = group[0].cat.level;
+                    const newLevel = Math.min(this.evolutionChain.length - 1, oldLevel + 2);
+                    const newType = this.evolutionChain[newLevel];
+                    const newCat = {
+                        id: this.catId++,
+                        x: centerX,
+                        y: centerY,
+                        level: newLevel,
+                        type: newType,
+                        element: null,
+                        birth: Date.now()
+                    };
+                    
+                    newCat.element = this.createElement(newCat);
+                    this.cats.push(newCat);
+                    
+                    // 大幅ボーナス
+                    const basePoints = Math.pow(2, newLevel + 2) * 25;
+                    const points = this.feverMode ? basePoints * 3 : basePoints;
+                    this.score += points;
+                    this.discovered.add(newType);
+                    
+                    // チェーン大幅増加
+                    this.chainCount += 3;
+                    this.maxChain = Math.max(this.maxChain, this.chainCount);
+                    this.updateChainDisplay();
+                    
+                    // 強制フィーバーモード
+                    this.enterFeverMode();
+                    
+                    if (newLevel > this.level) {
+                        this.level = newLevel;
+                        this.playSound('levelup');
+                        this.vibrate([300, 100, 300, 100, 300]);
+                    } else {
+                        this.playSound('merge');
+                        this.vibrate([200, 50, 200]);
+                    }
+                    
+                    const rect = document.getElementById('field').getBoundingClientRect();
+                    this.showFloatingScore(points, centerX + rect.left, centerY + rect.top, 'mega');
+                    this.showChainText(centerX + rect.left, centerY + rect.top);
+                    this.createUltimateExplosion(centerX + rect.left, centerY + rect.top);
+                    
+                    setTimeout(() => this.checkMerge(), 300);
+                    
+                }, 500);
+                
+                this.updateUI();
+            }
+            
+            enterFeverMode() {
+                if (this.feverMode) return;
+                
+                this.feverMode = true;
+                const feverEl = document.createElement('div');
+                feverEl.className = 'fever-mode';
+                document.body.appendChild(feverEl);
+                this.feverElement = feverEl;
+                
+                this.playSound('fever');
+                this.vibrate([100, 50, 100, 50, 100, 50, 100]);
+                
+                clearTimeout(this.feverTimer);
+                this.feverTimer = setTimeout(() => {
+                    this.exitFeverMode();
+                }, 10000); // 10秒間
+            }
+            
+            exitFeverMode() {
+                this.feverMode = false;
+                if (this.feverElement) {
+                    this.feverElement.remove();
+                    this.feverElement = null;
+                }
+            }
+            
+            updateChainDisplay() {
+                document.getElementById('chainDisplay').textContent = this.chainCount;
+                document.getElementById('chainItem').classList.add('pulse');
+                setTimeout(() => {
+                    document.getElementById('chainItem').classList.remove('pulse');
+                }, 600);
+                
+                clearTimeout(this.chainTimer);
+                this.chainTimer = setTimeout(() => {
+                    this.chainCount = 0;
+                    document.getElementById('chainDisplay').textContent = '0';
+                    this.exitFeverMode();
+                }, 5000);
+            }
+            
+            showFloatingScore(points, x, y, type = 'normal') {
+                const el = document.createElement('div');
+                el.className = `floating-score ${type}`;
+                el.textContent = `+${this.formatNum(points)}`;
+                el.style.left = Math.min(x, window.innerWidth - 100) + 'px';
+                el.style.top = Math.min(y, window.innerHeight - 50) + 'px';
+                
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), type === 'mega' ? 3000 : 2000);
+            }
+            
+            showChainText(x, y) {
+                const chainLevel = Math.min(this.chainMsgs.length - 1, Math.floor(this.chainCount / 2));
+                const text = this.chainMsgs[chainLevel];
+                
+                const el = document.createElement('div');
+                el.className = 'chain-text';
+                el.textContent = text;
+                el.style.left = Math.min(x - 100, window.innerWidth - 200) + 'px';
+                el.style.top = Math.min(y - 50, window.innerHeight - 100) + 'px';
+                
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 3000);
+            }
+            
+            createParticles(x, y, emojis, count) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const el = document.createElement('div');
+                        el.className = 'particle';
+                        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                        el.style.left = (x + (Math.random() - 0.5) * 60) + 'px';
+                        el.style.top = (y + (Math.random() - 0.5) * 60) + 'px';
+                        document.body.appendChild(el);
+                        setTimeout(() => el.remove(), 2000);
+                    }, i * 50);
+                }
+            }
+            
+            createMegaExplosion(x, y) {
+                const effects = ['💫', '✨', '🌟', '💖', '🎊', '🎆'];
+                this.createParticles(x, y, effects, 8);
+            }
+            
+            createUltimateExplosion(x, y) {
+                const effects = ['💥', '✨', '🌟', '💫', '🎊', '🎆', '💖', '🌈', '⚡', '🔥'];
+                this.createParticles(x, y, effects, 15);
+            }
+            
+            showMsg(text, x, y) {
+                const el = document.createElement('div');
+                el.className = 'msg';
+                el.textContent = text;
+                el.style.left = Math.min(x, window.innerWidth - 80) + 'px';
+                el.style.top = Math.min(y, window.innerHeight - 40) + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2500);
+            }
+            
+            playSound(type) {
+                if (!this.audioContext) return;
+                
+                try {
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume();
+                    }
+                    
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    const filterNode = this.audioContext.createBiquadFilter();
+                    
+                    oscillator.connect(filterNode);
+                    filterNode.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    let frequency, duration, filterFreq;
+                    
+                    switch(type) {
+                        case 'spawn':
+                            frequency = 600 + Math.random() * 200;
+                            duration = 0.3;
+                            filterFreq = 1200;
+                            break;
+                        case 'merge':
+                            frequency = 800;
+                            duration = 0.6;
+                            filterFreq = 2000;
+                            break;
+                        case 'levelup':
+                            frequency = 1200;
+                            duration = 1.0;
+                            filterFreq = 3000;
+                            break;
+                        case 'purr':
+                            frequency = 300;
+                            duration = 1.5;
+                            filterFreq = 600;
+                            break;
+                        case 'fever':
+                            frequency = 1500;
+                            duration = 2.0;
+                            filterFreq = 4000;
+                            break;
+                        default:
+                            frequency = 440;
+                            duration = 0.3;
+                            filterFreq = 1000;
+                    }
+                    
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.6, this.audioContext.currentTime + duration);
+                    
+                    filterNode.frequency.setValueAtTime(filterFreq, this.audioContext.currentTime);
+                    filterNode.Q.setValueAtTime(2, this.audioContext.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(0.15, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {
+                    // Audio error - ignore
+                }
+            }
+            
+            buyAuto() {
+                const cost = 100 * Math.pow(2, this.helpers);
+                if (this.score >= cost) {
+                    this.score -= cost;
+                    this.helpers++;
+                    this.playSound('levelup');
+                    this.vibrate([150]);
+                    this.updateUI();
+                }
+            }
+            
+            buyBoost() {
+                const cost = 300 * Math.pow(1.5, Math.floor(this.score / 1000));
+                if (this.score >= cost) {
+                    this.score -= cost;
+                    
+                    // 全猫ハッピー
+                    this.cats.forEach(cat => {
+                        cat.element.classList.add('merging');
+                        setTimeout(() => cat.element.classList.remove('merging'), 1500);
+                    });
+                    
+                    this.enterFeverMode();
+                    this.playSound('fever');
+                    this.vibrate([100, 50, 100, 50, 100]);
+                    this.updateUI();
+                }
+            }
+            
+            buyMagic() {
+                const cost = 800 * Math.pow(2, Math.floor(this.level / 5));
+                if (this.score >= cost) {
+                    this.score -= cost;
+                    
+                    // ランダムな場所に5匹召喚
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            const rect = document.getElementById('field').getBoundingClientRect();
+                            const x = Math.random() * (rect.width - 100) + 50;
+                            const y = Math.random() * (rect.height - 100) + 50;
+                            
+                            this.spawn({
+                                clientX: x + rect.left,
+                                clientY: y + rect.top
+                            });
+                        }, i * 200);
+                    }
+                    
+                    this.playSound('levelup');
+                    this.vibrate([200, 100, 200]);
+                    this.updateUI();
+                }
+            }
+            
+            autoSpawn() {
+                if (this.helpers > 0 && Math.random() < 0.4) {
+                    const rect = document.getElementById('field').getBoundingClientRect();
+                    const x = Math.random() * (rect.width - 80) + 40;
+                    const y = Math.random() * (rect.height - 80) + 40;
+                    
+                    this.spawn({
+                        clientX: x + rect.left,
+                        clientY: y + rect.top
+                    });
+                }
+            }
+            
+            update() {
+                // ゲーム状態更新
+                this.updateUI();
+            }
+            
+            updateUI() {
+                document.getElementById('score').textContent = this.formatNum(this.score);
+                document.getElementById('level').textContent = this.level;
+                
+                // スコア増加時のパルス効果
+                if (this.lastScore !== this.score) {
+                    document.getElementById('scoreItem').classList.add('pulse');
+                    setTimeout(() => {
+                        document.getElementById('scoreItem').classList.remove('pulse');
+                    }, 600);
+                    this.lastScore = this.score;
+                }
+                
+                // ボタンコスト更新
+                const autoCost = 100 * Math.pow(2, this.helpers);
+                const boostCost = 300 * Math.pow(1.5, Math.floor(this.score / 1000));
+                const magicCost = 800 * Math.pow(2, Math.floor(this.level / 5));
+                
+                document.getElementById('autoCost').textContent = this.formatNum(autoCost);
+                document.getElementById('boostCost').textContent = this.formatNum(boostCost);
+                document.getElementById('magicCost').textContent = this.formatNum(magicCost);
+                
+                document.getElementById('auto').disabled = this.score < autoCost;
+                document.getElementById('boost').disabled = this.score < boostCost;
+                document.getElementById('magic').disabled = this.score < magicCost;
+            }
+            
+            formatNum(n) {
+                if (n >= 1e9) return Math.floor(n / 1e9) + 'B';
+                if (n >= 1e6) return Math.floor(n / 1e6) + 'M';
+                if (n >= 1e3) return Math.floor(n / 1e3) + 'K';
+                return Math.floor(n).toString();
+            }
+        }
+        
+        // グローバル変数として設定（許可要求用）
+        const game = new UltimateNekopon();
+    </script>
+</body>
+</html>
